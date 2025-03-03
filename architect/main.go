@@ -1,9 +1,14 @@
 package main
 
 import (
+	"architect/common"
+	"architect/component"
 	"architect/modules/product/controller"
-	"architect/modules/product/domain/usecase"
+	productUC "architect/modules/product/domain/usecase"
 	productmysql "architect/modules/product/repository/mysql"
+	"architect/modules/user/infra/httpservice"
+	"architect/modules/user/infra/repository"
+	userUC "architect/modules/user/usecase"
 	"fmt"
 	"log"
 	"net/http"
@@ -33,7 +38,7 @@ func main() {
 
 	// Setup dependencies
 	repo := productmysql.NewMysqlRepo(db)
-	useCase := usecase.NewCreateProductUseCase(repo)
+	useCase := productUC.NewCreateProductUseCase(repo)
 	api := controller.NewApiController(useCase)
 
 	v1 := router.Group("/api/v1")
@@ -43,6 +48,11 @@ func main() {
 			product.POST("", api.CreateProductAPI())
 		}
 	}
+
+	tokenProvider := component.NewJWTProvider("jwtSecret", 60*60*24*7, 60*60*24*14)
+
+	userUseCase := userUC.NewUseCase(repository.NewUserRepo((db)), repository.NewSessionMySQLRepo((db)), tokenProvider, &common.Hasher{})
+	httpservice.NewUserService(userUseCase).Routes(v1)
 
 	router.Run("localhost:5000")
 }
