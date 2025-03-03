@@ -27,6 +27,24 @@ type useCase struct {
 	*LoginUC
 }
 
+type Builder interface {
+	BuildUserQueryRepo() UserQueryRepository
+	BuildUserCommandRepo() UserCommandRepository
+	BuildHasher() Hasher
+	BuildTokenProvider() TokenProvider
+	BuildSessionQueryRepo() SessionQueryRepository
+	BuildSessionCommandRepo() SessionCommandRepository
+}
+
+func UseCaseWithBuilder(b Builder) UseCase {
+
+	return &useCase{
+		registerUC: NewRegisterUC(b.BuildUserQueryRepo(), b.BuildUserCommandRepo(), b.BuildHasher()),
+		LoginUC:    NewLoginUC(b.BuildUserQueryRepo(), b.BuildSessionCommandRepo(), b.BuildTokenProvider(), b.BuildHasher()),
+	}
+
+}
+
 func NewUseCase(userRepo UserRepository, sessionRepo SessionRepository, tokenProvider TokenProvider, hasher Hasher) UseCase {
 	return &useCase{
 		registerUC: NewRegisterUC(userRepo, userRepo, hasher),

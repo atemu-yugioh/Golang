@@ -1,13 +1,12 @@
 package main
 
 import (
-	"architect/common"
+	"architect/builder"
 	"architect/component"
 	"architect/modules/product/controller"
 	productUC "architect/modules/product/domain/usecase"
 	productmysql "architect/modules/product/repository/mysql"
 	"architect/modules/user/infra/httpservice"
-	"architect/modules/user/infra/repository"
 	userUC "architect/modules/user/usecase"
 	"fmt"
 	"log"
@@ -51,7 +50,12 @@ func main() {
 
 	tokenProvider := component.NewJWTProvider("jwtSecret", 60*60*24*7, 60*60*24*14)
 
-	userUseCase := userUC.NewUseCase(repository.NewUserRepo((db)), repository.NewSessionMySQLRepo((db)), tokenProvider, &common.Hasher{})
+	userBuilder := builder.NewSimpleBuilder(db, db, tokenProvider)
+
+	// userUseCase := userUC.NewUseCase(repository.NewUserRepo((db)), repository.NewSessionMySQLRepo((db)), tokenProvider, &common.Hasher{})
+
+	userUseCase := userUC.UseCaseWithBuilder(userBuilder)
+
 	httpservice.NewUserService(userUseCase).Routes(v1)
 
 	router.Run("localhost:5000")
