@@ -54,7 +54,7 @@ func main() {
 
 	// userUseCase := userUC.NewUseCase(repository.NewUserRepo((db)), repository.NewSessionMySQLRepo((db)), tokenProvider, &common.Hasher{})
 
-	userUseCase := userUC.UseCaseWithBuilder(userBuilder)
+	userUseCase := userUC.UseCaseWithBuilder(builder.NewComplexBuilder(userBuilder))
 
 	httpservice.NewUserService(userUseCase).Routes(v1)
 

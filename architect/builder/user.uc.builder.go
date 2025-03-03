@@ -2,6 +2,8 @@ package builder
 
 import (
 	"architect/common"
+	"architect/modules/user/domain"
+	"architect/modules/user/infra/cache"
 	"architect/modules/user/infra/repository"
 	"architect/modules/user/usecase"
 
@@ -40,4 +42,18 @@ func (s simpleBuilder) BuildSessionQueryRepo() usecase.SessionQueryRepository {
 
 func (s simpleBuilder) BuildSessionCommandRepo() usecase.SessionCommandRepository {
 	return repository.NewSessionMySQLRepo(s.commandDB)
+}
+
+// Complex builder
+
+type complexBuilder struct {
+	simpleBuilder
+}
+
+func NewComplexBuilder(simpleBuilder simpleBuilder) complexBuilder {
+	return complexBuilder{simpleBuilder: simpleBuilder}
+}
+
+func (cb complexBuilder) BuildUserQueryRepo() usecase.UserQueryRepository {
+	return cache.NewUserCacheRepo(cb.simpleBuilder.BuildUserQueryRepo(), make(map[string]*domain.User))
 }
