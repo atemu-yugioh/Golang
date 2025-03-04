@@ -4,12 +4,19 @@ import (
 	"architect/modules/user/domain"
 	"architect/modules/user/usecase"
 	"context"
+
+	"github.com/google/uuid"
 )
 
 // Proxy design pattern
 type userCacheRepo struct {
 	realRepo usecase.UserQueryRepository
 	cache    map[string]*domain.User
+}
+
+// FindById implements usecase.UserQueryRepository.
+func (c userCacheRepo) FindById(ctx context.Context, id uuid.UUID) (*domain.User, error) {
+	return c.realRepo.FindById(ctx, id)
 }
 
 func NewUserCacheRepo(realRepo usecase.UserQueryRepository, cache map[string]*domain.User) userCacheRepo {

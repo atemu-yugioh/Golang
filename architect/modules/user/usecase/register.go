@@ -54,6 +54,7 @@ func (uc *registerUC) Register(ctx context.Context, dto EmailPasswordRegisterDTO
 		hashedPassword,
 		salt,
 		domain.RoleUser,
+		"activated",
 	)
 
 	if err != nil {

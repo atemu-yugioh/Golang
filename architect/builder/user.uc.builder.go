@@ -44,6 +44,10 @@ func (s simpleBuilder) BuildSessionCommandRepo() usecase.SessionCommandRepositor
 	return repository.NewSessionMySQLRepo(s.commandDB)
 }
 
+func (s simpleBuilder) BuildSessionRepo() usecase.SessionRepository {
+	return repository.NewSessionMySQLRepo(s.commandDB)
+}
+
 // Complex builder
 
 type complexBuilder struct {
